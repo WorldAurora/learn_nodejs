@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>banner</title>
+	<style>
+		body > .my-panel{
+			width: 60%;
+			position: absolute;
+			z-index: 100;
+			left: 50%;
+			top: 100px;
+			margin-left: -30%;
+			display: none;
+		}
+
+		body > .my-panel-shadow{
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			left: 0;
+			top: 0;
+			background: #000;
+			opacity: 0.6;
+			z-index: 99;
+			display: none;
+		}
+
+		body > .my-dialog{
+			width: 300px;
+			position: absolute;
+			z-index: 100;
+			left: 50%;
+			top: 200px;
+			margin-left: -150px;
+			display: none;
+		}
+
+		body > .my-dialog-shadow{
+			width: 100%;
+			height: 100%;
+			position: fixed;
+			left: 0;
+			top: 0;
+			background: #000;
+			opacity: 0.3;
+			z-index: 99;
+			display: none;
+		}
+	</style>
+	<link rel="stylesheet" href="<%=HTTP_ROOT%>/css/bootstrap.min2.css">
+</head>
+<body>
+	<ul class="nav nav-tabs">
+		<li class="nav-item"><a href="#" class="nav-link active">页面一</a></li>
+		<li class="nav-item"><a href="#" class="nav-link">页面二</a></li>
+		<li class="nav-item"><a href="#" class="nav-link">页面三</a></li>
+	</ul>
+	<!-- 表格 -->
+	<a href="#" id="btn_add" class="btn btn-primary">添加</a>
+	<table class="table">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>标题</th>
+				<th>图片地址</th>
+				<th>链接地址</th>
+				<th>序号</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+			<% datas.forEach(function(data){ %>
+			<tr>
+				<td><%=data.ID%></td>
+				<td><%=data.title%></td>
+				<td><%=data.src%></td>
+				<td><%=data.href%></td>
+				<td><%=data.serial%></td>
+				<td>
+					<a href="<%=HTTP_ROOT%>/admin/banner/delete/<%=data.ID%>" onclick="return confirm('真的要删除吗?')" class="btn btn-danger">删除</a>
+					<a href="<%=HTTP_ROOT%>/admin/banner/modify/<%=data.ID%>" class="btn btn-outline-secondary">修改</a>
+				</td>
+			</tr>
+			<%})%>
+		</tbody>
+	</table>
+	<!-- 修改面板 -->
+	<div class="my-panel-shadow"></div>
+	<div class="card my-panel">
+		<div class="card-header">
+			<%=type=='view'?'添加':'修改'%>
+		</div>
+		<div class="card-body">
+			<form action="<%=action%>" enctype="multipart/form-data" method="post">
+				<%banner_fields.forEach(function(field){%>
+				<div class="form-group row">
+					<label class="col-sm-2" for="<%=field.title%>"><%=field.title%></label>
+					<div class="col-sm-10">
+						<input <%if(type=='modify'){%>value="<%=old_data[field.name]%>"<%}%> placeholder="请输入<%=field.title%>" class="form-control" type="<%=field.type%>" name="<%=field.name%>" id="<%=field.name%>">
+					</div>
+				</div>
+				<%})%>
+				<div class="form-group row">
+					<div class="col-sm-10 offset-sm-2">
+						<input class="btn btn-primary" type="submit" value="提交">
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+	<!-- 对话框 -->
+	<div class="my-dialog-shadow"></div>
+	<div class="card my-dialog">
+		<div class="card-header">
+			标题
+		</div>
+		<div class="card-body">
+			内容
+		</div>
+		<div class="card-footer">
+			<div class="btn-group">
+				<button class="btn btn-secondary btn-sm">按钮一</button>
+				<button class="btn btn-secondary btn-sm">按钮二</button>
+			</div>
+		</div>
+	</div>
+	<script src="<%=HTTP_ROOT%>/js/jquery-3.4.1.min.js"></script>
+	<script>
+		$('#btn_add').click(function(){
+			$('.my-panel, .my-panel-shadow').show();
+		});
+	</script>
+	<%if(type=='modify'){%>
+	<script>
+		$('.my-panel, .my-panel-shadow').show();
+	</script>
+	<%}%>
+</body>
+</html>

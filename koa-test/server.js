@@ -1,0 +1,56 @@
+const Koa = require('koa');
+const Router = require('koa-router');
+const static = require('./routers/static');
+const body = require('koa-better-body');
+const path = require('path');
+const session = require('koa-session');
+const fs = require('fs');
+const ejs = require('koa-ejs');
+const config = require('./config');
+
+let server = new Koa();
+server.listen(config.HTTP_PORT);
+console.log(`server running at ${config.HTTP_PORT}`);
+
+//中间件
+server.use(body({
+	uploadDir: config.UPLOAD_DIR,
+}));
+
+server.keys = fs.readFileSync('./.keys').toString().split('\n');
+server.use(session({
+	maxAge: 20*60*1000,
+	renew: true
+},server));
+
+//数据库
+server.context.db = require('./libs/database');
+server.context.config = config;
+
+//渲染
+ejs(server, {
+	root: path.resolve(__dirname, 'template'),
+	layout: false,
+	viewExt: 'html',
+	cache: false,
+	debug:false
+});
+
+//路由和static
+let router = new Router();
+
+//统一处理
+// router.use(async (ctx, next) => {
+// 	try{
+// 		await next();
+// 	}catch(e){
+// 		ctx.throw(500, "Internal Server Error");
+// 		console.log(e);
+// 	}
+// });
+
+router.use('/admin', require('./routers/admin'));
+router.use('', require('./routers/www'));
+static(router)
+
+server.use(router.routes());
